@@ -1,0 +1,21 @@
+version: "3.7"
+services:
+  bar:
+    build:
+      context: bar-service
+    ports:
+      - 5401:8080
+
+  foo:
+    build:
+      context: foo-service
+    ports:
+      - 5402:8080
+  kafka:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      KAFKA_ADVERTISED_HOST_PORT: kafka:9092
+    image: trajano/kafka
