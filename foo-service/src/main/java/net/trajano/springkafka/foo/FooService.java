@@ -10,17 +10,21 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
-
-import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 @EnableKafkaStreams
 public class FooService {
 
     @Bean
-    public ReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
-        return new ReplyingKafkaTemplate<>(pf, lc);
+    public ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
+        final ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> template = new ValidatingReplyingKafkaTemplate<>(
+                pf,
+                lc,
+                record -> record
+                        .value()
+                        .getSource()
+                        .contains("slow"));
+        return template;
     }
 
 //    @Bean

@@ -5,14 +5,14 @@ services:
       context: bar-service
     environment:
       SPRING_APPLICATION_NAME: slowbar
-      SLEEP: 2001
+      SLEEP: 2000
       SPRING_KAFKA_CONSUMER_GROUP-ID: slow
   faster-bar:
     build:
       context: bar-service
     environment:
       SPRING_APPLICATION_NAME: fastbar
-      SLEEP: 2000
+      SLEEP: 500
       SPRING_KAFKA_CONSUMER_GROUP-ID: fast
   foo:
     build:
