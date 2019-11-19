@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReverseResponse {
     private String text;
+    private String source;
 }

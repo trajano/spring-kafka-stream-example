@@ -1,10 +1,17 @@
 version: "3.7"
 services:
-  bar:
+  slow-bar:
     build:
       context: bar-service
-    ports:
-      - 5401:8080
+    environment:
+      SPRING_APPLICATION_NAME: slowbar
+      SLEEP: 5000
+  faster-bar:
+    build:
+      context: bar-service
+    environment:
+      SPRING_APPLICATION_NAME: fastbar
+      SLEEP: 2000
 
   foo:
     build:
