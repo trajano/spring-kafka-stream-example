@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  * <li>0:06 Kid: Sorry uncle 3 you're too slow, so I am ignoring you
  * </ul>
  *
- * @param K key
- * @param V request value
- * @param R response value
+ * @param <K> key
+ * @param <V> request value
+ * @param <R> response value
  */
 public class ValidatingReplyingKafkaTemplate<K, V, R> extends ReplyingKafkaTemplate<K, V, R> {
 

@@ -17,25 +17,18 @@ public class FooService {
 
     @Bean
     public ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
-        final ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> template = new ValidatingReplyingKafkaTemplate<>(
+        final ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> template = new ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse>(
                 pf,
                 lc,
-                record -> record
-                        .value()
+                (k,v) -> v
                         .getSource()
                         .contains("slow"));
         return template;
     }
 
-//    @Bean
-//    public ProducerFactory<String, ReverseRequest> producerFactory() {
-//        return new DefaultKafkaProducerFactory<>(Map.of(), new StringSerializer(), new JsonSerializer<>());
-//    }
-
     @Bean
     public KafkaMessageListenerContainer<String, ReverseResponse> replyContainer(ConsumerFactory<String, ReverseResponse> cf) {
         ContainerProperties containerProperties = new ContainerProperties("myreplies");
-//        containerProperties.setGroupId("mygroup");
         return new KafkaMessageListenerContainer<>(cf, containerProperties);
 
     }
