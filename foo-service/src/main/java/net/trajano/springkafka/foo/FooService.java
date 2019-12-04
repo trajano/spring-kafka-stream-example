@@ -23,6 +23,7 @@ public class FooService {
                 (k,v) -> v
                         .getSource()
                         .contains("slow"));
+        template.setReplyTimeout(10000L);
         return template;
     }
 

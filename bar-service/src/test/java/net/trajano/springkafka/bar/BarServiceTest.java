@@ -10,16 +10,21 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.support.TopicPartitionInitialOffset;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest
 @DirtiesContext
 @EmbeddedKafka(
-        controlledShutdown = true,
+        controlledShutdown = false,
         topics = {
                 "reverse",
                 "myreplies"
@@ -50,19 +55,22 @@ public class BarServiceTest {
     @Before
     public void setup() {
         ContainerProperties containerProperties = new ContainerProperties("myreplies");
+        Map<String, Object> consumerProps2 = new HashMap<>(cf.getConfigurationProperties());
+        consumerProps2.put("group.id", UUID.randomUUID().toString());
+        DefaultKafkaConsumerFactory<Integer, ReverseResponse> cf = new DefaultKafkaConsumerFactory<>(consumerProps2);
+
         KafkaMessageListenerContainer<Integer, ReverseResponse> container = new KafkaMessageListenerContainer<>(cf,
                 containerProperties);
+
         replyKafkaTemplate = new ReplyingKafkaTemplate<>(
                 pf,
                 container);
         replyKafkaTemplate.start();
-
     }
 
     @After
     public void tearDown() {
         replyKafkaTemplate.stop();
-        replyKafkaTemplate.destroy();
     }
 
     @Test

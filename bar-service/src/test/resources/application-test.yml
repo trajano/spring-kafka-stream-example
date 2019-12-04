@@ -4,9 +4,9 @@ spring:
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
     consumer:
-      group-id: my-consumer
+      auto-offset-reset: earliest
     topic:
       receiver: receiver.t
 logging:
-  root:
-    level: WARN
+  level:
+    root: WARN

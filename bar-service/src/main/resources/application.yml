@@ -4,6 +4,7 @@ spring:
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
+      group-id: my-bar-consumer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: net.trajano.springkafka.model
