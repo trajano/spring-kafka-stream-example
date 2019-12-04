@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class FooController {
 
     @Autowired
-    private ValidatingReplyingKafkaTemplate<?, ReverseRequest, ReverseResponse> replyingKafkaTemplate;
+    private ReplyingKafkaTemplate<?, ReverseRequest, ReverseResponse> replyingKafkaTemplate;
 
     @GetMapping("/hello")
     public Mono<ReverseResponse> hello() {

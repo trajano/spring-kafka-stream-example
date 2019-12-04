@@ -10,21 +10,26 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 
 @SpringBootApplication
 @EnableKafkaStreams
 public class FooService {
 
     @Bean
-    public ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
-        final ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> template = new ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse>(
+    public ReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
+        return new ReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse>(
+                pf,
+                lc);
+    }
+
+    public ReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> validatingReplyKafkaTemplate(ProducerFactory<String, ReverseRequest> pf, KafkaMessageListenerContainer<String, ReverseResponse> lc) {
+        return new ValidatingReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse>(
                 pf,
                 lc,
-                (k,v) -> v
+                (k, v) -> v
                         .getSource()
                         .contains("slow"));
-        template.setReplyTimeout(10000L);
-        return template;
     }
 
     @Bean
