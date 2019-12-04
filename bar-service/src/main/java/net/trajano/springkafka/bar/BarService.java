@@ -21,7 +21,10 @@ public class BarService {
     @Value("${spring.application.name}")
     private String source;
 
-    @KafkaListener(topics = "reverse")
+    @KafkaListener(
+            topics = "reverse",
+            groupId = "reverse-consumer"
+    )
     @SendTo
     public ReverseResponse reverse(ReverseRequest request) throws InterruptedException {
         final String text = new StringBuilder(request.getText()).reverse().toString();

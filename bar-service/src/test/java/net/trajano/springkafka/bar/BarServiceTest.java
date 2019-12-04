@@ -9,19 +9,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -42,17 +40,17 @@ public class BarServiceTest {
     private EmbeddedKafkaBroker embeddedKafka;
 
     @Autowired
-    private ProducerFactory<String, ReverseRequest> pf;
+    private ProducerFactory<Integer, ReverseRequest> pf;
+
+    @Autowired
+    private ConsumerFactory<Integer, ReverseResponse> cf;
+
+    private ReplyingKafkaTemplate<Integer, ReverseRequest, ReverseResponse> replyKafkaTemplate;
 
     @Before
     public void setup() {
         ContainerProperties containerProperties = new ContainerProperties("myreplies");
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("mygroup", "false",
-                embeddedKafka);
-        consumerProps.put("value.deserializer", org.springframework.kafka.support.serializer.JsonDeserializer.class);
-        consumerProps.put("spring.json.trusted.packages", "net.trajano.springkafka.model");
-        DefaultKafkaConsumerFactory<String, ReverseResponse> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
-        KafkaMessageListenerContainer<String, ReverseResponse> container = new KafkaMessageListenerContainer<>(cf,
+        KafkaMessageListenerContainer<Integer, ReverseResponse> container = new KafkaMessageListenerContainer<>(cf,
                 containerProperties);
         replyKafkaTemplate = new ReplyingKafkaTemplate<>(
                 pf,
@@ -66,8 +64,6 @@ public class BarServiceTest {
         replyKafkaTemplate.stop();
         replyKafkaTemplate.destroy();
     }
-
-    private ReplyingKafkaTemplate<String, ReverseRequest, ReverseResponse> replyKafkaTemplate;
 
     @Test
     public void test() throws Exception {
@@ -84,9 +80,9 @@ public class BarServiceTest {
     @Test
     public void testNoTimeout() throws Exception {
         assertEquals(
-                "eihcrA",
+                "sedemihcrA",
                 replyKafkaTemplate
-                        .sendAndReceive(new ProducerRecord<>("reverse", new ReverseRequest("Archie")))
+                        .sendAndReceive(new ProducerRecord<>("reverse", new ReverseRequest("Archimedes")))
                         .get()
                         .value()
                         .getText()

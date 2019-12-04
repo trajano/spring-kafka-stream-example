@@ -3,6 +3,8 @@ spring:
     banner-mode: "off"
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
+    consumer:
+      group-id: my-consumer
     topic:
       receiver: receiver.t
 logging:
